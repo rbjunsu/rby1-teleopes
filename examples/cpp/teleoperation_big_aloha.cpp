@@ -78,7 +78,7 @@ Eigen::Matrix<double, 2, 1> hand_controller_button = Eigen::Matrix<double, 2, 1>
 std::vector<Eigen::Matrix<double, 2, 1>> hand_controller_trigger_min_max = {Eigen::Matrix<double, 2, 1>({0, 1000}),
                                                                             Eigen::Matrix<double, 2, 1>({0, 1000})};
 int gripper_direction = 0; 
-bool ma_info_verbose = true;
+bool ma_info_verbose = false;
 
 std::vector<double> torque_constant = {1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.95,
                                        1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.95};
