@@ -7,3 +7,12 @@
 [submodule "third-party/osqp-eigen"]
 	path = third-party/osqp-eigen
 	url = https://github.com/robotology/osqp-eigen
+[submodule "third_party/DynamixelSDK"]
+	path = third_party/DynamixelSDK
+	url = https://github.com/ROBOTIS-GIT/DynamixelSDK.git
+[submodule "third_party/osqp"]
+	path = third_party/osqp
+	url = https://github.com/osqp/osqp.git
+[submodule "third_party/osqp-eigen"]
+	path = third_party/osqp-eigen
+	url = https://github.com/robotology/osqp-eigen.git
