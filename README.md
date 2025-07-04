@@ -22,25 +22,22 @@
 APIs,
 making it easy to integrate into various applications, from basic scripting to advanced real-time control.
 
-# Installation
+# Get Started Teleoperation Example
 
-## Python
 
-Install SDK via ``pip``:
+#### Example Descriptions
 
-```bash
-pip install rby1-sdk
-```
+| Example     | Description                                                                                     |
+|-------------|-------------------------------------------------------------------------------------------------|
+| `big_aloha` | Stand-type configuration with an Aloha-style handle                                             |
+| `big`       | Stand-type configuration with a basic handle                                                    |
+| `exo`       | Wearable-type configuration with a basic handle                                                 |
 
-Alternatively, install from source:
+---
 
-```bash
-pip install .
-# or
-poetry install
-```
 
-## C++
+
+## C++ Installation
 
 ### Build From Source
 
@@ -94,18 +91,7 @@ cmake --build . # or make
 make install
 ```
 
-# Get Started Teleoperation Example
 
-
-#### Example Descriptions
-
-| Example     | Description                                                                                     |
-|-------------|-------------------------------------------------------------------------------------------------|
-| `big_aloha` | Stand-type configuration with an Aloha-style handle                                             |
-| `big`       | Stand-type configuration with a basic handle                                                    |
-| `exo`       | Wearable-type configuration with a basic handle                                                 |
-
----
 ## C++ Example
 
 ```c++
