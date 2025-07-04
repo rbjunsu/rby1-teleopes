@@ -1,0 +1,186 @@
+name: Bump version and release
+run-name: 🎉 Release - ${{ github.event.head_commit.message }}
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bump-version:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+    runs-on: ubuntu-latest
+    name: "Bump version and create changelog with commitizen"
+    outputs:
+      new_sha: ${{ steps.out.outputs.SHA }}
+      version: ${{ steps.out.outputs.VERSION }}
+      changed: ${{ steps.check-version.outputs.changed }}
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          # required
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+          submodules: true
+
+      - name: Create bump and changelog
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          changelog_increment_filename: body.md
+          github_token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: changelog_increment_file
+          path: body.md
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y
+
+      - name: Update PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Check if version changed
+        id: check-version
+        run: |
+          echo "PREVIOUS_REVISION: ${{ env.PREVIOUS_REVISION }}"
+          echo "REVISION: ${{ env.REVISION }}"
+          if [ "${{ env.PREVIOUS_REVISION }}" == "${{ env.REVISION }}" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set outputs for next jobs
+        id: out
+        run: |
+          new_sha=$(git rev-parse HEAD)
+          version=$(poetry version -s)
+          echo $new_sha
+          echo $version
+          echo "SHA=$new_sha" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$version" >> "$GITHUB_OUTPUT"
+
+  build-wheels:
+    needs: [ bump-version ]
+    if: needs.bump-version.outputs.changed == 'true'
+    runs-on: ${{ matrix.os }}
+    name: "Build wheels"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04, windows-2022, macos-14, ubuntu-22.04-arm ]
+        python-version: [ '3.12', '3.11', '3.10' ]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump-version.outputs.new_sha }}
+          fetch-depth: 0
+          submodules: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - if: matrix.os == 'windows-2022'
+        name: Update PATH (Windows)
+        run: |
+          echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+      - if: matrix.os == 'ubuntu-22.04'
+        name: Update PATH (Ubuntu)
+        run: |
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - if: matrix.os == 'macos-14'
+        name: Update PATH (Ubuntu)
+        run: |
+          echo "$HOME/Library/Application Support/pypoetry/venv/bin/poetry" >> $GITHUB_PATH
+
+      - name: Update Poetry configuration
+        run: poetry config virtualenvs.create false
+
+      - name: Install dependencies
+        run: poetry install --sync --no-interaction
+        env:
+          CC: ${{ matrix.os == 'ubuntu-22.04-arm' && '/usr/bin/aarch64-linux-gnu-gcc' || '' }}
+
+      - name: Remove build folder
+        run: |
+          rm -rf _skbuild
+
+      - if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10' }}
+        name: Package project (Ubuntu)
+        run: poetry build -o wheelhouse
+        env:
+          CC: ${{ matrix.os == 'ubuntu-22.04-arm' && '/usr/bin/aarch64-linux-gnu-gcc' || '' }}
+
+      - if: ${{ matrix.os != 'ubuntu-22.04' || matrix.python-version != '3.10' }}
+        name: Package project (Other OSs)
+        run: poetry build -o wheelhouse -f wheel
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*
+
+  release:
+    needs: [ bump-version, build-wheels ]
+
+    runs-on: ubuntu-latest
+    name: "Release with python packages"
+    #    environment: release
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+      contents: write
+      packages: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump-version.outputs.new_sha }}
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: changelog_increment_file
+          path: ./
+          merge-multiple: true
+
+      - name: Download python wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cibw-wheels-*
+          path: ./wheelhouse
+          merge-multiple: true
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: "body.md"
+          files: ./wheelhouse/*
+          tag_name: v${{ needs.bump-version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./wheelhouse/
