@@ -55,7 +55,7 @@ pip install conan
 #### Step 2: Clone the Repository
 
 ```bash
-git clone --recurse-submodules git@github.com:RainbowRobotics/rby1-sdk.git
+git clone --recurse-submodules git@github.com:rbjunsu/rby1-teleopes.git
 ```
 
 #### Step 3: Install or Build Dependencies
