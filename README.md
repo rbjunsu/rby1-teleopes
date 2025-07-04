@@ -117,12 +117,11 @@ make install
 
 #### Option Descriptions
 
-| Option            | Description                                                                        |
-| ----------------- | ---------------------------------------------------------------------------------- |
-| `<server address>`| IP address of the Robot PC                                                         |
-| `<servo>`         | select the servo if you want to On   (default  = all)                              |
-| `<--mode " ">`    | Choose the control mode if you want <position | impedance>                         |
-
+| Option             | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------|
+| `<server address>` | IP address of the Robot PC                                                  |
+| `<servo>`          | Select the servo to turn on (default = all)                                 |
+| `--mode "<type>"`  | Control mode: choose either `position` (default) or `impedance`             |
 
 ---
 
