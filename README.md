@@ -96,11 +96,35 @@ make install
 
 # Get Started Teleoperation Example
 
+
+#### Example Descriptions
+
+| Example     | Description                                                                                     |
+|-------------|-------------------------------------------------------------------------------------------------|
+| `big_aloha` | Stand-type configuration with an Aloha-style handle                                             |
+| `big`       | Stand-type configuration with a basic handle                                                    |
+| `exo`       | Wearable-type configuration with a basic handle                                                 |
+
+---
 ## C++ Example
 
 ```c++
-./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051
+./build/examples/cpp/example_teleoperation_big_aloha <server address>
+
+      # example
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051
 ```
+
+#### Option Descriptions
+
+| Option            | Description                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `<server address>`| IP address of the Robot PC                                                         |
+| `<servo>`         | select the servo if you want to On   (default  = all)                              |
+| `<--mode " ">`    | Choose the control mode if you want <position | impedance>                         |
+
+
+---
 
 ## ARM Intellisense Issue
 
