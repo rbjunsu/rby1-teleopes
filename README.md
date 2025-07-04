@@ -112,10 +112,7 @@ make install
 ./build/examples/cpp/example_teleoperation_big_aloha <server address> <servo> <mode>
 
       # example
-      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 
-      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 right_arm
-      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 impedance
-      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 wheel position
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 right_arm position
       
 ```
 

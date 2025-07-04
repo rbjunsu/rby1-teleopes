@@ -1094,7 +1094,7 @@ if (argc == 3) {
     std::cerr << "Unable to ping all devices for master arm" << std::endl;
     Eigen::Map<Eigen::VectorXi> ids(activeIDs.data(), activeIDs.size());
     std::cerr << "active ids: " << ids.transpose() << std::endl;
-    // return 1;
+    return 1;
   }
 
   for (int id : activeIDs) {

@@ -80,8 +80,9 @@ std::vector<Eigen::Matrix<double, 2, 1>> hand_controller_trigger_min_max = {Eige
 int gripper_direction = 0; 
 bool ma_info_verbose = true;
 
-std::vector<double> torque_constant = {1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 1.3043,
-                                       1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 1.3043};
+std::vector<double> torque_constant = {1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.95,
+                                       1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.95};
+
 
 void signalHandler(int signum) {
     std::cout << "\nCtrl-C detected! Stopping..." << std::endl;
@@ -97,9 +98,9 @@ void SendVibration(dynamixel::PortHandler* portHandler, dynamixel::PacketHandler
 }
 
 
-  
 dynamixel::PortHandler* g_port_handler = nullptr;
 dynamixel::PacketHandler* g_packet_handler = nullptr;
+
 
   std::unordered_map<int, int> operating_modes_;
 
@@ -152,7 +153,6 @@ dynamixel::PacketHandler* g_packet_handler = nullptr;
   }
 
 
-  
   std::optional<std::vector<std::pair<int, int>>> GroupFastSyncReadOperatingMode(const std::vector<int>& ids,
                                                                                  bool use_cache) {
     std::vector<std::pair<int, int>> operating_mode_vector;
@@ -545,7 +545,6 @@ void control_loop_for_master_arm(dynamixel::PortHandler* portHandler, dynamixel:
   //     {"J0_Shoulder_Pitch_R", "J1_Shoulder_Roll_R", "J2_Shoulder_Yaw_R", "J3_Elbow_R", "J4_Wrist_Yaw1_R",
   //      "J5_Wrist_Pitch_R", "J6_Wrist_Yaw2_R", "J7_Shoulder_Pitch_L", "J8_Shoulder_Roll_L", "J9_Shoulder_Yaw_L",
   //      "J10_Elbow_L", "J11_Wrist_Yaw1_L", "J12_Wrist_Pitch_L", "J13_Wrist_Yaw2_L"});
-
   
   auto robot = std::make_shared<rb::dyn::Robot<14>>(LoadRobotFromURDF(PATH "/master_arm_new.urdf", "MA_Base"));
   auto state = robot->MakeState<std::vector<std::string>, std::vector<std::string>>(
@@ -723,7 +722,6 @@ void control_loop_for_master_arm(dynamixel::PortHandler* portHandler, dynamixel:
       }
     }
 
-
     GroupSyncWriteTorqueEnable(id_torque_onoff_vector, 0);      
     GroupSyncWriteOperatingMode(id_and_mode_vector);
     GroupSyncWriteTorqueEnable(id_torque_onoff_vector, 1);
@@ -733,7 +731,6 @@ void control_loop_for_master_arm(dynamixel::PortHandler* portHandler, dynamixel:
     static int cnt = 0;
     if (ma_info_verbose) {
       if (cnt++ % 5 == 0) {
-
       std::cout << "button_info : " << button_info.transpose() << std::endl;
         std::cout << "trigger_info : " << trigger_info.transpose() << std::endl;
         std::cout << "right q_joint [deg]: " << q_joint.block(0, 0, 7, 1).transpose() * 180. / 3.141592 << std::endl;
@@ -891,6 +888,7 @@ void control_loop_for_gripper(dynamixel::PortHandler* portHandler, dynamixel::Pa
 
 int main(int argc, char** argv) {
 
+
   std::signal(SIGINT, signalHandler);
 
   try {
@@ -932,6 +930,7 @@ int main(int argc, char** argv) {
     std::cerr << "Usage: " << argv[0] << " <server address> [servo] [mode]" << std::endl;
     return 1;
   }
+
  
   auto robot = rb::Robot<y1_model::A>::Create(address);
 
@@ -1049,7 +1048,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  for (int id = 0x80; id < 0x80 + 4; id++) {
+  for (int id = 0x80; id < 0x80 + 2; id++) {
     uint8_t dxl_error = 0;
     int dxl_comm_result = packetHandler->ping(portHandler, id, &dxl_error);
     if (dxl_comm_result == COMM_SUCCESS) {
@@ -1064,7 +1063,7 @@ int main(int argc, char** argv) {
     std::cerr << "Unable to ping all devices for master arm" << std::endl;
     Eigen::Map<Eigen::VectorXi> ids(activeIDs.data(), activeIDs.size());
     std::cerr << "active ids: " << ids.transpose() << std::endl;
-    // return 1;
+    return 1;
   }
 
   for (int id : activeIDs) {
