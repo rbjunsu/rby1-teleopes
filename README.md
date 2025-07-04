@@ -109,10 +109,14 @@ make install
 ## C++ Example
 
 ```c++
-./build/examples/cpp/example_teleoperation_big_aloha <server address>
+./build/examples/cpp/example_teleoperation_big_aloha <server address> <servo> <mode>
 
       # example
-      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 right_arm
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 impedance
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 wheel position
+      
 ```
 
 #### Option Descriptions
@@ -121,9 +125,11 @@ make install
 |--------------------|-----------------------------------------------------------------------------|
 | `<server address>` | IP address of the Robot PC                                                  |
 | `<servo>`          | Select the servo to turn on (default = all)                                 |
-| `--mode "<type>"`  | Control mode: choose either `position` (default) or `impedance`             |
+| `<mode>`           | Control mode: choose either `position` (default) or `impedance`             |
+
 
 ---
+
 
 ## ARM Intellisense Issue
 

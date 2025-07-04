@@ -778,6 +778,9 @@ std::string resolve_symlink(const std::string& symlink) {
 }
 
 int main(int argc, char** argv) {
+
+  std::signal(SIGINT, signalHandler);
+
   try {
     // Latency timer setting
     upc::InitializeDevice(upc::kGripperDeviceName);
@@ -787,18 +790,37 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  if (argc < 2) {  
-    std::cerr << "Usage: " << argv[0] << " <server address> [servo]" << std::endl;
+ 
+  if (argc < 2) {
+    std::cerr << "Usage: " << argv[0] << " <server address> <servo> <mode>" << std::endl;
     return 1;
   }
 
-  std::string address{argv[1]};
-  std::string servo = ".*"; // 기본값
+  std::string address = argv[1];
+  std::string servo = ".*"; // default = All Servo On
+  std::string control_mode = "position";  // default = position
 
-  if (argc >= 3) {
+
+  if (argc == 3) {
+    std::string arg2 = argv[2];
+    if (arg2 == "position" || arg2 == "impedance") {
+      control_mode = arg2;
+    } else {
+      servo = arg2;
+    }
+  } else if (argc == 4) {
     servo = argv[2];
+    control_mode = argv[3];
+    if (control_mode != "position" && control_mode != "impedance") {
+      std::cerr << "Invalid mode. Use 'position' or 'impedance'." << std::endl;
+      return 1;
+    }
+  } else if (argc > 4) {
+    std::cerr << "Too many arguments." << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <server address> [servo] [mode]" << std::endl;
+    return 1;
   }
-
+ 
   auto robot = rb::Robot<y1_model::A>::Create(address);
 
   std::cout << "Attempting to connect to the robot..." << std::endl;

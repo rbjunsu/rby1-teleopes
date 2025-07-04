@@ -933,33 +933,34 @@ int main(int argc, char** argv) {
 
  
   if (argc < 2) {
-    std::cerr << "Usage: " << argv[0] << " <server address> [servo] [--mode position|impedance]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <server address> <servo> <mode>" << std::endl;
     return 1;
   }
 
   std::string address = argv[1];
-  std::string servo = ".*";
-  std::string control_mode = "position";
+  std::string servo = ".*"; // default = All Servo On
+  std::string control_mode = "position";  // default = position
 
 
-  for (int i = 2; i < argc; ++i) {
-    std::string arg = argv[i];
-    if (arg == "--mode" && i + 1 < argc) {
-      control_mode = argv[++i];
-      if (control_mode != "position" && control_mode != "impedance") {
-        std::cerr << "Invalid mode. Use 'position' or 'impedance'." << std::endl;
-        return 1;
-      }
-    } else if (servo == ".*") {
-      servo = arg;  
-    } else {
-      std::cerr << "Unknown argument: " << arg << std::endl;
-      return 1;
-    }
+if (argc == 3) {
+  std::string arg2 = argv[2];
+  if (arg2 == "position" || arg2 == "impedance") {
+    control_mode = arg2;
+  } else {
+    servo = arg2;
   }
-
-
-  
+} else if (argc == 4) {
+  servo = argv[2];
+  control_mode = argv[3];
+  if (control_mode != "position" && control_mode != "impedance") {
+    std::cerr << "Invalid mode. Use 'position' or 'impedance'." << std::endl;
+    return 1;
+  }
+} else if (argc > 4) {
+  std::cerr << "Too many arguments." << std::endl;
+  std::cerr << "Usage: " << argv[0] << " <server address> [servo] [mode]" << std::endl;
+  return 1;
+}
 
 
   auto robot = rb::Robot<y1_model::A>::Create(address);
