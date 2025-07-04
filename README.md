@@ -98,7 +98,7 @@ make install
 ./build/examples/cpp/example_teleoperation_big_aloha <server address> <servo> <mode>
 
       # example
-      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 right_arm position
+      # ./build/examples/cpp/example_teleoperation_big_aloha 192.168.30.1:50051 impedance
       
 ```
 
@@ -107,7 +107,7 @@ make install
 | Option             | Description                                                                 |
 |--------------------|-----------------------------------------------------------------------------|
 | `<server address>` | IP address of the Robot PC                                                  |
-| `<servo>`          | Select the servo to turn on (default = all)                                 |
+| `<servo>`          | Select the servo to turn on (default = all, except 'head')                  |
 | `<mode>`           | Control mode: choose either `position` (default) or `impedance`             |
 
 

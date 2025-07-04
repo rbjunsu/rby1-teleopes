@@ -898,7 +898,7 @@ int main(int argc, char** argv) {
   }
 
   std::string address = argv[1];
-  std::string servo = ".*"; // default = All Servo On
+  std::string servo = "^(?!.*head).*"; // default = All servos on, except 'head'
   std::string control_mode = "position";  // default = position
 
 
