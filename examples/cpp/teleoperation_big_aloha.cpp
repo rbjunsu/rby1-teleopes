@@ -80,8 +80,8 @@ std::vector<Eigen::Matrix<double, 2, 1>> hand_controller_trigger_min_max = {Eige
 int gripper_direction = 0; 
 bool ma_info_verbose = true;
 
-std::vector<double> torque_constant = {1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.5167,
-                                       1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.5167};
+std::vector<double> torque_constant = {1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.95,
+                                       1.6591, 1.6591, 1.6591, 1.3043, 1.3043, 1.3043, 0.95};
 
                                        
 void signalHandler(int signum) {
